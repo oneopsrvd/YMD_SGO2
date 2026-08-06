@@ -8,13 +8,13 @@ import datetime
 
 # 1. Page Configuration
 st.set_page_config(
-    page_title="SGO2 YMS - Performance & Tempo Real",
-    page_icon="🚛",
+    page_title="SGO2 YMS - Pátio em Tempo Real",
+    page_icon="🚦",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-META_PERMANENCIA_MIN = 30  # Meta operacional fixa: 30 minutos
+META_PERMANENCIA_MIN = 30  # Meta operacional de permanência: 30 minutos
 
 # 2. Theme State
 if "theme" not in st.session_state:
@@ -48,7 +48,7 @@ st.markdown(f"""
     }}
     
     .block-container {{
-        padding: 1.5rem 2rem 2.5rem !important;
+        padding: 1.2rem 1.8rem 2.5rem !important;
         max-width: 1440px !important;
     }}
     
@@ -56,19 +56,19 @@ st.markdown(f"""
         background: {card_bg};
         border: 1px solid {border_color};
         border-radius: 12px;
-        padding: 1.25rem 1.4rem;
+        padding: 1.1rem 1.3rem;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         height: 100%;
     }}
     .kpi-label {{
-        font-size: 0.78rem;
+        font-size: 0.76rem;
         color: {text_muted};
-        font-weight: 600;
+        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
     }}
     .kpi-value {{
-        font-size: 2rem;
+        font-size: 2.1rem;
         font-weight: 700;
         color: {text_color};
         margin-top: 0.2rem;
@@ -76,7 +76,7 @@ st.markdown(f"""
     }}
     .kpi-subtext {{
         font-size: 0.78rem;
-        margin-top: 0.4rem;
+        margin-top: 0.35rem;
     }}
     
     .badge {{
@@ -89,7 +89,6 @@ st.markdown(f"""
     .badge-success {{ background: rgba(34, 197, 94, 0.18); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }}
     .badge-danger {{ background: rgba(239, 68, 68, 0.18); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }}
     .badge-warning {{ background: rgba(234, 179, 8, 0.18); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.3); }}
-    .badge-xpt {{ background: rgba(168, 85, 247, 0.18); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.3); }}
     
     .chart-card {{
         background: {card_bg};
@@ -104,31 +103,24 @@ st.markdown(f"""
         color: {text_color};
         margin-bottom: 0.8rem;
     }}
-    .insight-card {{
-        background: rgba(37, 99, 235, 0.08);
-        border: 1px solid rgba(37, 99, 235, 0.3);
-        border-radius: 10px;
-        padding: 1rem 1.2rem;
-        margin-bottom: 1rem;
-    }}
 </style>
 """, unsafe_allow_html=True)
 
 # 4. Auto Refresh (1 min = 60000ms)
-st_autorefresh(interval=60000, key="yms_sgo2_realtime_refresh_v2")
+st_autorefresh(interval=60000, key="yms_sgo2_realtime_refresh_v4")
 
-# 5. Header & Controls
+# 5. Header & Streaming Status
 col_title, col_status, col_theme = st.columns([6, 3, 1])
 
 with col_title:
     st.markdown(f"""
     <div style="display: flex; align-items: center; gap: 12px;">
-        <span style="font-size: 2.2rem;">🚛</span>
+        <span style="font-size: 2.2rem;">🚦</span>
         <div>
             <h2 style="margin: 0; font-weight: 700; font-size: 1.65rem; color: {text_color};">
-                Monitor YMS SGO2 <span style="font-size: 0.85rem; color: {accent_color}; background: rgba(255,230,0,0.15); padding: 3px 8px; border-radius: 6px; margin-left: 6px;">META 30 MIN</span>
+                Painel do Pátio SGO2 <span style="font-size: 0.85rem; color: #000; background: {accent_color}; font-weight: 700; padding: 3px 8px; border-radius: 6px; margin-left: 6px;">AO VIVO (FAROL 30M)</span>
             </h2>
-            <p style="margin: 0; font-size: 0.82rem; color: {text_muted};">Pátio Service Center Rio Verde - GO (SGO2) • Atualização em Tempo Real (60s)</p>
+            <p style="margin: 0; font-size: 0.82rem; color: {text_muted};">Pátio Service Center Rio Verde - GO (SGO2) • Atualização a cada 60s</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -137,7 +129,7 @@ with col_status:
     now_str = datetime.datetime.now().strftime("%H:%M:%S")
     st.markdown(f"""
     <div style="text-align: right; padding-top: 6px;">
-        <span class="badge badge-success">🟢 SESSÃO STREAMING ATIVA</span>
+        <span class="badge badge-success">🔴 MONITORAMENTO AO VIVO</span>
         <div style="font-size: 0.78rem; color: {text_muted}; margin-top: 4px;">Atualizado às: <b>{now_str}</b></div>
     </div>
     """, unsafe_allow_html=True)
@@ -145,17 +137,16 @@ with col_status:
 with col_theme:
     st.button("☀️ Light" if IS_DARK else "🌙 Dark", on_click=toggle_theme, use_container_width=True)
 
-st.markdown("<hr style='margin: 1rem 0; border-color: " + border_color + ";'>", unsafe_allow_html=True)
+st.markdown("<hr style='margin: 0.8rem 0; border-color: " + border_color + ";'>", unsafe_allow_html=True)
 
 # 6. Sidebar Controls
 with st.sidebar:
-    st.header("⚙️ Configurações & Filtros")
+    st.header("⚙️ Configurações do Pátio")
     facility_selected = st.selectbox("Facility (Centro Logístico)", ["SGO2", "BRXGO1", "SSP1", "SDO1"], index=0)
     meta_permanencia_input = st.number_input("Meta Tempo Permanência (Min):", min_value=5, max_value=120, value=30, step=5)
     
     st.subheader("Filtros de Veículos")
     exclude_heavy = st.checkbox("Excluir Veículos Pesados (Truck/Carreta)", value=True)
-    only_offenders = st.checkbox("Exibir Apenas Veículos Fora da Meta (> 30 min)", value=False)
     only_xpt = st.checkbox("Exibir Apenas Operações XPT", value=False)
     
     search_plate = st.text_input("Filtrar Placa:", value="").upper().strip()
@@ -178,7 +169,10 @@ def load_yms_realtime_data(facility_id: str, exclude_heavy_v: bool):
       DATETIME_ADD(jo.STARTED_AT,  INTERVAL 1 HOUR) AS checkin,
       DATETIME_ADD(jo.FINISHED_AT, INTERVAL 1 HOUR) AS checkout,
       
-      -- Cálculo exato da permanência (Se não finalizou, compara com horário atual)
+      -- Flag se o veículo ainda está fisicamente no pátio (Sem check-out)
+      CASE WHEN jo.FINISHED_AT IS NULL THEN TRUE ELSE FALSE END AS no_patio_agora,
+      
+      -- Tempo de Permanência (se saiu usa tempo fechado, se está no pátio usa tempo decorrido ao vivo)
       COALESCE(
         DATETIME_DIFF(DATETIME_ADD(jo.FINISHED_AT, INTERVAL 1 HOUR), DATETIME_ADD(jo.STARTED_AT, INTERVAL 1 HOUR), MINUTE),
         DATETIME_DIFF(CURRENT_DATETIME(), DATETIME_ADD(jo.STARTED_AT, INTERVAL 1 HOUR), MINUTE)
@@ -236,117 +230,132 @@ def load_yms_realtime_data(facility_id: str, exclude_heavy_v: bool):
     
     return client.query(query).to_dataframe()
 
+# Function to assign Farol (Traffic Light Badge)
+def calcular_farol(minutos, meta=30):
+    if minutos <= 20:
+        return "🟢 No Prazo"
+    elif minutos <= meta:
+        return "🟡 Atenção"
+    else:
+        return "🔴 Estourado (>30m)"
+
 try:
-    with st.spinner("Atualizando indicadores YMS do SGO2..."):
+    with st.spinner("Carregando pátio SGO2 em tempo real..."):
         df_raw = load_yms_realtime_data(facility_selected, exclude_heavy)
         
     df = df_raw.copy()
-    
-    # 8. Metricas e Aderencia (YMS do Dia)
     if not df.empty:
         df["excedente_min"] = df["permanencia_minutos"].apply(lambda x: max(0, x - meta_permanencia_input))
         df["dentro_meta"] = df["permanencia_minutos"] <= meta_permanencia_input
+        df["farol"] = df["permanencia_minutos"].apply(lambda x: calcular_farol(x, meta_permanencia_input))
         
-        total_rotas_dia = len(df)
-        total_dentro_meta = df["dentro_meta"].sum()
-        total_fora_meta = total_rotas_dia - total_dentro_meta
-        
-        pct_aderencia_yms = (total_dentro_meta / total_rotas_dia * 100) if total_rotas_dia > 0 else 0
-        tempo_medio_dia = round(df["permanencia_minutos"].mean(), 1)
-        tempo_maximo_dia = df["permanencia_minutos"].max()
+        # Filtros de Pátio Agora vs Consolidado
+        df_no_patio = df[df["no_patio_agora"] == True]
+        df_no_patio_risco = df_no_patio[df_no_patio["permanencia_minutos"] > meta_permanencia_input]
     else:
-        total_rotas_dia = total_dentro_meta = total_fora_meta = 0
-        pct_aderencia_yms = 0
-        tempo_medio_dia = tempo_maximo_dia = 0
+        df_no_patio = pd.DataFrame()
+        df_no_patio_risco = pd.DataFrame()
 
-    # 9. Top KPI Cards Section
-    k1, k2, k3, k4 = st.columns(4)
-    
-    # Status color for YMS Adherence
-    if pct_aderencia_yms >= 90:
-        badge_class = "badge-success"
-        status_text = "🟢 EXCELENTE (>= 90%)"
-        kpi_color = "#22c55e"
-    elif pct_aderencia_yms >= 80:
-        badge_class = "badge-warning"
-        status_text = "🟡 ATENÇÃO (80% - 89%)"
-        kpi_color = "#eab308"
-    else:
-        badge_class = "badge-danger"
-        status_text = "🔴 CRÍTICO (< 80%)"
-        kpi_color = "#ef4444"
+    # Apply Client-side filters if active
+    if only_xpt:
+        df = df[df["is_xpt"] == True]
+        if not df_no_patio.empty:
+            df_no_patio = df_no_patio[df_no_patio["is_xpt"] == True]
+            
+    if search_plate:
+        df = df[df["plate"].str.contains(search_plate, case=False, na=False)]
+        if not df_no_patio.empty:
+            df_no_patio = df_no_patio[df_no_patio["plate"].str.contains(search_plate, case=False, na=False)]
 
-    with k1:
+    # =========================================================================
+    # 8. DESTAQUE SUPERIOR (KPI CARDS DO PÁTIO AGORA)
+    # =========================================================================
+    cnt_no_patio = len(df_no_patio)
+    cnt_no_patio_vermelho = len(df_no_patio[df_no_patio["permanencia_minutos"] > meta_permanencia_input]) if not df_no_patio.empty else 0
+    cnt_no_patio_amarelo = len(df_no_patio[(df_no_patio["permanencia_minutos"] > 20) & (df_no_patio["permanencia_minutos"] <= meta_permanencia_input)]) if not df_no_patio.empty else 0
+    cnt_no_patio_verde = len(df_no_patio[df_no_patio["permanencia_minutos"] <= 20]) if not df_no_patio.empty else 0
+
+    r1, r2, r3, r4 = st.columns(4)
+    with r1:
         st.markdown(f"""
-        <div class="kpi-card">
-            <div class="kpi-label">ADERÊNCIA YMS DO DIA (TODAS AS ROTAS)</div>
-            <div class="kpi-value" style="color: {kpi_color};">{pct_aderencia_yms:.1f}%</div>
-            <div class="kpi-subtext"><span class="badge {badge_class}">{status_text}</span></div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-    with k2:
-        st.markdown(f"""
-        <div class="kpi-card">
-            <div class="kpi-label">TOTAL VEÍCULOS / ROTAS HOJE</div>
-            <div class="kpi-value">{total_rotas_dia}</div>
-            <div class="kpi-subtext" style="color: {text_muted};">Pátio {facility_selected}</div>
+        <div class="kpi-card" style="border-left: 4px solid #3b82f6;">
+            <div class="kpi-label">VEÍCULOS NO PÁTIO AGORA</div>
+            <div class="kpi-value" style="color: #3b82f6;">{cnt_no_patio}</div>
+            <div class="kpi-subtext" style="color: {text_muted};">Entraram e Ainda Não Saíram</div>
         </div>
         """, unsafe_allow_html=True)
 
-    with k3:
+    with r2:
         st.markdown(f"""
-        <div class="kpi-card">
-            <div class="kpi-label">FORA DA META (> {meta_permanencia_input} MIN)</div>
-            <div class="kpi-value" style="color: #ef4444;">{total_fora_meta}</div>
-            <div class="kpi-subtext" style="color: #ef4444;">Veículos Ofensores de Tempo</div>
+        <div class="kpi-card" style="border-left: 4px solid #ef4444;">
+            <div class="kpi-label">🔴 FAROL VERMELHO (> 30 MIN)</div>
+            <div class="kpi-value" style="color: #ef4444;">{cnt_no_patio_vermelho}</div>
+            <div class="kpi-subtext" style="color: #ef4444;">Estouraram a Meta no Pátio</div>
         </div>
         """, unsafe_allow_html=True)
-        
-    with k4:
+
+    with r3:
         st.markdown(f"""
-        <div class="kpi-card">
-            <div class="kpi-label">PERMANÊNCIA MÉDIA VS MÁXIMA</div>
-            <div class="kpi-value" style="color: #3b82f6;">{tempo_medio_dia} min</div>
-            <div class="kpi-subtext" style="color: {text_muted};">Maior Estadia: <b style="color: #ef4444;">{tempo_maximo_dia} min</b></div>
+        <div class="kpi-card" style="border-left: 4px solid #eab308;">
+            <div class="kpi-label">🟡 FAROL AMARELO (21 - 30 MIN)</div>
+            <div class="kpi-value" style="color: #eab308;">{cnt_no_patio_amarelo}</div>
+            <div class="kpi-subtext" style="color: #eab308;">Atenção / Próximos do Limite</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with r4:
+        st.markdown(f"""
+        <div class="kpi-card" style="border-left: 4px solid #22c55e;">
+            <div class="kpi-label">🟢 FAROL VERDE (<= 20 MIN)</div>
+            <div class="kpi-value" style="color: #22c55e;">{cnt_no_patio_verde}</div>
+            <div class="kpi-subtext" style="color: #22c55e;">Fluxo Rápido / No Prazo</div>
         </div>
         """, unsafe_allow_html=True)
 
     st.write("")
 
-    # 10. Automated Insights Section (Recomendações Operacionais)
-    if not df.empty and total_fora_meta > 0:
-        df_offenders = df[df["dentro_meta"] == False]
-        worst_vehicle_type = df_offenders["vehicle_type"].mode()[0] if not df_offenders.empty else "N/A"
-        worst_vehicle_count = len(df_offenders[df_offenders["vehicle_type"] == worst_vehicle_type])
+    # =========================================================================
+    # 9. PRIORIDADE MÁXIMA #1: TABELA TEMPO REAL COM FAROL (ÚLTIMO ENTRADO NA 1ª LINHA)
+    # =========================================================================
+    st.markdown("<div class='chart-card' style='border: 2px solid #2563eb;'>", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+        <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: #2563eb;">
+            🚨 TABELA EM TEMPO REAL - VEÍCULOS NO PÁTIO AGORA (ORDEM DE ENTRADA)
+        </h3>
+        <span style="font-size: 0.8rem; color: {text_muted};">Último veículo que entrou e não saiu fica na 1ª linha</span>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    if not df_no_patio.empty:
+        # ORDENADO DO ÚLTIMO QUE ENTROU PARA O MAIS ANTIGO (checkin DESC)
+        df_patio_ao_vivo = df_no_patio.sort_values(by="checkin", ascending=False)[[
+            "farol", "checkin", "permanencia_minutos", "excedente_min", 
+            "plate", "vehicle_type", "route_id", "destination_name", "is_xpt", "JOURNEY_STATUS"
+        ]].copy()
         
-        # Peak Hour for Offenses
-        df_offenders["checkin_hour"] = pd.to_datetime(df_offenders["checkin"]).dt.hour
-        peak_hour = df_offenders["checkin_hour"].mode()[0] if not df_offenders.empty else None
-        peak_str = f"{peak_hour:02d}:00 - {peak_hour+1:02d}:00" if peak_hour is not None else "N/A"
+        df_patio_ao_vivo.columns = [
+            "Farol YMS", "Horário Entrou (Check-in)", "Tempo Decorrido (min)", "Excedente (+min)", 
+            "Placa", "Classificação do Carro", "ID Rota", "Destino (Place / Agencia)", "É XPT?", "Status Atual"
+        ]
+        
+        st.dataframe(
+            df_patio_ao_vivo,
+            use_container_width=True,
+            hide_index=True
+        )
+    else:
+        st.success("🎉 Não há nenhum veículo no pátio SGO2 sem check-out neste momento.")
+        
+    st.markdown("</div>", unsafe_allow_html=True)
 
-        st.markdown(f"""
-        <div class="insight-card">
-            <h4 style="margin:0 0 6px 0; color: #3b82f6; font-weight: 700; font-size: 1rem;">💡 Insights Operacionais Automatizados do Pátio</h4>
-            <div style="display: flex; gap: 2rem; flex-wrap: wrap; font-size: 0.85rem; color: {text_color};">
-                <div>🚨 <b>Principal Modelo Ofensor:</b> <span style="color:#ef4444; font-weight:bold;">{worst_vehicle_type}</span> ({worst_vehicle_count} estouros)</div>
-                <div>⏱️ <b>Horário Crítico de Gargalo:</b> <span style="color:#eab308; font-weight:bold;">{peak_str}</span></div>
-                <div>📍 <b>Meta Alvo:</b> Permanência máxima de <b>{meta_permanencia_input} minutos</b></div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    # Apply Client-Side Filters
-    if only_offenders:
-        df = df[df["dentro_meta"] == False]
-    if only_xpt:
-        df = df[df["is_xpt"] == True]
-    if search_plate:
-        df = df[df["plate"].str.contains(search_plate, case=False, na=False)]
-
-    # 11. Highlighted Section: Ranking de Carros Ofensores (Maior para Menor Tempo)
+    # =========================================================================
+    # 10. PRIORIDADE #2: RANKING DE OFENSORES DO DIA (MAIOR PARA MENOR TEMPO)
+    # =========================================================================
     st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
-    st.markdown(f"<div class='chart-title'>🔥 Ranking de Classificação de Estouro de Permanência (> {meta_permanencia_input} min)</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='chart-title'>🔥 Ranking de Classificação de Estouro de Permanência (> {meta_permanencia_input} min) - Maior para Menor</div>", unsafe_allow_html=True)
     
     df_ranking = df[df["permanencia_minutos"] > meta_permanencia_input].sort_values(by="permanencia_minutos", ascending=False).copy()
     
@@ -361,21 +370,83 @@ try:
             "ID Rota", "Destino (Place / Agencia)", "Check-in", "Check-out", "É XPT?"
         ]
         
-        st.dataframe(
-            df_ranking_display,
-            use_container_width=True,
-            hide_index=True
-        )
+        st.dataframe(df_ranking_display, use_container_width=True, hide_index=True)
     else:
-        st.success(f"🎉 Nenhum veículo excedeu a meta de {meta_permanencia_input} minutos com os filtros atuais!")
+        st.success(f"🎉 Nenhum veículo excedeu a meta de {meta_permanencia_input} minutos no dia!")
         
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # 12. Visual Charts (Aderência por Categoria e Evolução da Permanência)
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # =========================================================================
+    # 11. CONSOLIDADO E INDICADORES YMS DO DIA (TODAS AS ROTAS)
+    # =========================================================================
+    st.markdown("<h3 style='margin:0 0 0.8rem 0; font-weight:700;'>📊 INDICADORES YMS CONSOLIDADOS DO DIA (TODAS AS ROTAS)</h3>", unsafe_allow_html=True)
+    
+    total_rotas_dia = len(df)
+    total_dentro_meta = df["dentro_meta"].sum() if not df.empty else 0
+    total_fora_meta = total_rotas_dia - total_dentro_meta
+    pct_aderencia_yms = (total_dentro_meta / total_rotas_dia * 100) if total_rotas_dia > 0 else 0
+    tempo_medio_dia = round(df["permanencia_minutos"].mean(), 1) if not df.empty else 0
+    tempo_maximo_dia = df["permanencia_minutos"].max() if not df.empty else 0
+    
+    if pct_aderencia_yms >= 90:
+        badge_class = "badge-success"
+        status_text = "🟢 EXCELENTE (>= 90%)"
+        kpi_color = "#22c55e"
+    elif pct_aderencia_yms >= 80:
+        badge_class = "badge-warning"
+        status_text = "🟡 ATENÇÃO (80% - 89%)"
+        kpi_color = "#eab308"
+    else:
+        badge_class = "badge-danger"
+        status_text = "🔴 CRÍTICO (< 80%)"
+        kpi_color = "#ef4444"
+
+    k1, k2, k3, k4 = st.columns(4)
+    with k1:
+        st.markdown(f"""
+        <div class="kpi-card">
+            <div class="kpi-label">ADERÊNCIA YMS DO DIA (TODAS AS ROTAS)</div>
+            <div class="kpi-value" style="color: {kpi_color};">{pct_aderencia_yms:.1f}%</div>
+            <div class="kpi-subtext"><span class="badge {badge_class}">{status_text}</span></div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with k2:
+        st.markdown(f"""
+        <div class="kpi-card">
+            <div class="kpi-label">TOTAL VEÍCULOS NO DIA</div>
+            <div class="kpi-value">{total_rotas_dia}</div>
+            <div class="kpi-subtext" style="color: {text_muted};">Estourados no Dia: <b style="color:#ef4444;">{total_fora_meta}</b></div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with k3:
+        st.markdown(f"""
+        <div class="kpi-card">
+            <div class="kpi-label">DENTRO DA META (<= {meta_permanencia_input} MIN)</div>
+            <div class="kpi-value" style="color: #22c55e;">{total_dentro_meta}</div>
+            <div class="kpi-subtext" style="color: #22c55e;">Aderentes</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with k4:
+        st.markdown(f"""
+        <div class="kpi-card">
+            <div class="kpi-label">MÉDIA DE ESTADIA NO DIA</div>
+            <div class="kpi-value" style="color: #3b82f6;">{tempo_medio_dia} min</div>
+            <div class="kpi-subtext" style="color: {text_muted};">Maior Estadia: <b style="color: #ef4444;">{tempo_maximo_dia} min</b></div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.write("")
+
+    # 12. Visual Charts
     c_left, c_right = st.columns(2)
     
     with c_left:
-        st.markdown("<div class='chart-card'><div class='chart-title'>📊 Aderência YMS (<= 30 min) por Classificação do Veículo</div>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-card'><div class='chart-title'>📊 % Aderência YMS por Categoria de Veículo</div>", unsafe_allow_html=True)
         if not df_raw.empty:
             df_cat = df_raw.groupby("vehicle_type").agg(
                 total=("JOURNEY_ID", "count"),
@@ -406,7 +477,7 @@ try:
         st.markdown("</div>", unsafe_allow_html=True)
 
     with c_right:
-        st.markdown("<div class='chart-card'><div class='chart-title'>📈 Distribuição de Permanência dos Veículos (Minutos)</div>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-card'><div class='chart-title'>📈 Distribuição do Tempo de Permanência (Minutos)</div>", unsafe_allow_html=True)
         if not df_raw.empty:
             fig_hist = px.histogram(
                 df_raw,
@@ -425,33 +496,6 @@ try:
             )
             st.plotly_chart(fig_hist, use_container_width=True, config={"displayModeBar": False})
         st.markdown("</div>", unsafe_allow_html=True)
-
-    # 13. Tabela Completa de Todas as Movimentações
-    st.markdown("<div class='chart-card'>", unsafe_allow_html=True)
-    st.markdown("<div class='chart-title'>📋 Tabela Geral de Movimentações (Todas as Rotas do Dia)</div>", unsafe_allow_html=True)
-    
-    if not df.empty:
-        df_all = df[[
-            "checkin", "checkout", "permanencia_minutos", "dentro_meta", 
-            "vehicle_type", "plate", "route_id", "destination_name", "is_xpt", "JOURNEY_STATUS"
-        ]].copy()
-        
-        df_all.columns = [
-            "Check-in", "Check-out", "Permanência (min)", "Dentro Meta (<=30min)?", 
-            "Classificação do Carro", "Placa", "ID Rota", "Destino (Place / Agencia)", "É XPT?", "Status Jornada"
-        ]
-        
-        st.dataframe(df_all, use_container_width=True, hide_index=True)
-        
-        # Download Button
-        csv_data = df_all.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="📥 Exportar Todas as Rotas (CSV)",
-            data=csv_data,
-            file_name=f"YMS_SGO2_TodasRotas_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}.csv",
-            mime="text/csv"
-        )
-    st.markdown("</div>", unsafe_allow_html=True)
 
 except Exception as e:
     st.error(f"Erro ao consultar o BigQuery: {e}")
