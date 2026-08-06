@@ -154,8 +154,16 @@ with st.sidebar:
 # 7. BigQuery Query Fetcher
 @st.cache_data(ttl=55)
 def load_yms_realtime_data(facility_id: str, exclude_heavy_v: bool):
-    client = bigquery.Client(project="meli-bi-data")
-    
+    # Suporte para credenciais via st.secrets (Streamlit Cloud) ou gcloud local
+    if "gcp_service_account" in st.secrets:
+        from google.oauth2 import service_account
+        creds = service_account.Credentials.from_service_account_info(
+            st.secrets["gcp_service_account"]
+        )
+        client = bigquery.Client(credentials=creds, project="meli-bi-data")
+    else:
+        client = bigquery.Client(project="meli-bi-data")
+        
     heavy_clause = ""
     if exclude_heavy_v:
         heavy_clause = 'AND v.VEHICLE_TYPE NOT IN ("Cavalo","Carreta_Alongada","Truck","Toco")'
